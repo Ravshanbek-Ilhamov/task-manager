@@ -26,12 +26,16 @@
                 </div>
             @endif
 
+            {{-- @php
+                dd($areas[0]->users->name);
+            @endphp --}}
+
             <table class="table table-striped table-bordered">
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>User ID</th>
                         <th>Name</th>
+                        <th>User ID</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -39,8 +43,8 @@
                     @foreach ($areas as $area)
                         <tr>
                             <td>{{ $area->id }}</td>
-                            <td>{{ $area->user_id }}</td>
                             <td>{{ $area->name }}</td>
+                            <td>{{ $area->users->name }}</td>
                             <td>
                                 <a href="#" 
                                    class="btn btn-sm btn-warning edit-btn" 

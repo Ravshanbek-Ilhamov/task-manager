@@ -14,7 +14,10 @@
   <link rel="stylesheet" href="{{ asset('plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
+  <!-- Include Select2 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/css/select2.min.css" rel="stylesheet" />
 
+  @yield('styles')
 
 </head>
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -30,44 +33,25 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="/users" class="nav-link">Home</a>
       </li>
-
     </ul>
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-
-      {{-- @if (auth()->check())   --}}
-      {{-- <li class="nav-item d-none d-sm-inline-block">
-        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-            @csrf
-            <button type="submit" class="nav-link" style="background: none; border: none; color: inherit; padding: 0; cursor: pointer;">
-                Logout
-            </button>
-        </form>
-    </li> --}}
-
-{{-- <li class="nav-item d-none d-sm-inline-block"> --}}
-    {{-- <a href="{{ route('logout') }}" class="nav-link">Logout</a> --}}
-{{-- </li> --}}
-
-
-  {{-- @else --}}
-      <li class="nav-item d-none d-sm-inline-block">
-          <a href="/" class="nav-link">Login</a>
-      </li>
-      {{-- <li class="nav-item d-none d-sm-inline-block">
-          <a href="/registration" class="nav-link">Register</a>
-      </li> --}}
-  {{-- @endif --}}
-  
-
+      @if (auth()->check())  
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="{{ route('logout') }}" class="nav-link">Logout</a>
+        </li>
+      @else
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">Login</a>
+        </li>
+      @endif
     </ul>
   </nav>
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
     <a href="#" class="brand-link">
       <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">AdminLTE 3</span>
@@ -80,67 +64,33 @@
         <div class="image">
           <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
-        {{-- <div class="info"> --}}
-          {{-- <a href="#" class="d-block">{{auth()->user()->name}}</a> --}}
-        {{-- </div> --}}
-      </div>
-
-      <!-- SidebarSearch Form -->
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-
           <a href="/users" class="nav-link">
             <i class="nav-icon fas fa-chart-pie"></i>
-            <p>
-              Users
-            </p>
+            <p>Users</p>
           </a>
-
-
           <a href="/areas" class="nav-link">
             <i class="nav-icon fas fa-chart-pie"></i>
-            <p>
-              Areas
-            </p>
+            <p>Areas</p>
           </a>
-
           <a href="/categories" class="nav-link">
             <i class="nav-icon fas fa-chart-pie"></i>
-            <p>
-              Categories
-            </p>
+            <p>Categories</p>
           </a>
-
+          <a href="/tasks" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Tasks</p>
+          </a>
         </ul>
       </nav>
-      <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
   </aside>
 
-    @yield('content')
-
-  <!-- /.content-wrapper -->
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
+  @yield('content')
 
   <!-- Main Footer -->
   <footer class="main-footer">
@@ -163,19 +113,10 @@
 <!-- AdminLTE App -->
 <script src="{{ asset('dist/js/adminlte.js') }}"></script>
 
-<!-- PAGE PLUGINS -->
-<!-- jQuery Mapael -->
-<script src="{{ asset('plugins/jquery-mousewheel/jquery.mousewheel.js') }}"></script>
-<script src="{{ asset('plugins/raphael/raphael.min.js') }}"></script>
-<script src="{{ asset('plugins/jquery-mapael/jquery.mapael.min.js') }}"></script>
-<script src="{{ asset('plugins/jquery-mapael/maps/usa_states.min.js') }}"></script>
-<!-- ChartJS -->
-<script src="{{ asset('plugins/chart.js/Chart.min.js') }}"></script>
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js"></script>
 
-<!-- AdminLTE for demo purposes -->
-<script src="{{ asset('dist/js/demo.js') }}"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{ asset('dist/js/pages/dashboard2.js') }}"></script>
+@yield('scripts')
 
 </body>
 </html>

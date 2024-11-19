@@ -15,4 +15,15 @@ class Area extends Model
         'name',
     ];
 
+
+    public function users(){
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+
+    public function taskArea(){
+        return $this->hasMany(TaskArea::class);
+    }
+
+
 }

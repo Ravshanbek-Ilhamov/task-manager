@@ -17,15 +17,6 @@
                     </button>
                 </div>
             @endif
-
-            @if (session('welcoming'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Welcome To Our Users Table Page </strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
             
             @if (session('error'))
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -37,8 +28,8 @@
             @endif
 
             {{-- @if (auth()->check() && auth()->user()->email_verified_at) --}}
-                <div class="mb-3">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">
+                <div class="">
+                    <button type="button" class="btn btn-primary m-2" data-toggle="modal" data-target="#createUserModal">
                         Create User
                     </button>
                 </div>

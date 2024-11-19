@@ -5,7 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AreaController;
-
+use App\Http\Controllers\TaskAreaController;
+use App\Http\Controllers\TaskController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -39,3 +40,5 @@ Route::post('/area/store', [AreaController::class, 'store']);
 Route::put('/area/update', [AreaController::class, 'update']);
 Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 
+Route::resource('tasks', TaskController::class);
+Route::resource('taskAreas', TaskAreaController::class);

@@ -20,17 +20,14 @@ class TaskController extends Controller
      {
          $query = Task::query();
      
-         // Check if the user is not an admin
          if (auth()->user()->role !== 'admin') {
-             $userAreas = auth()->user()->areas->pluck('id'); // Get user's area IDs
+             $userAreas = auth()->user()->areas->pluck('id');
      
-             // Restrict tasks to user's areas
              $query->whereHas('areas', function ($query) use ($userAreas) {
-                 $query->whereIn('areas.id', $userAreas); // Specify 'areas.id' explicitly
+                 $query->whereIn('areas.id', $userAreas);
              });
          }
      
-         // Apply date range filtering if provided
          if ($request->has('start_date') && $request->has('end_date')) {
              $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
          }

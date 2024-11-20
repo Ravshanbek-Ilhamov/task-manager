@@ -14,12 +14,13 @@ class UserController extends Controller
         return view('user.user',['users'=>$users]);
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:5',
             'role' => 'required|string',
         ]);
     

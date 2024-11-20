@@ -33,8 +33,9 @@ class Task extends Model
         return $this->belongsToMany(Area::class, 'task_areas', 'task_id', 'area_id');
     }
 
-//     public function taskAreas()
-// {
-//     return $this->hasMany(TaskArea::class);
-// }
+    public function responses(){
+        return $this->hasMany(Response::class);
+    }
+
+
 }

@@ -42,3 +42,17 @@ Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 
 Route::resource('tasks', TaskController::class);
 Route::resource('taskAreas', TaskAreaController::class);
+
+
+
+Route::get('/responses', [TaskController::class, 'response_page'])->name('response.index');
+Route::post('/tasks/{taskAreaStatus}/open', [TaskController::class, 'openTask'])->name('tasks.open');
+Route::post('/tasks/{taskAreaStatus}/do', [TaskController::class, 'doTask'])->name('tasks.do');
+Route::patch('/responses/{id}/accept', [TaskController::class, 'accept'])->name('responses.accept');
+Route::patch('/responses/{id}/reject', [TaskController::class, 'reject'])->name('responses.reject');
+Route::get('/responses', [TaskController::class, 'response_page'])->name('responses.page');
+Route::patch('/responses/reject-with-comment', [TaskController::class, 'rejectWithComment'])->name('responses.rejectWithComment');
+
+Route::get('/user-tasks',[TaskController::class,'userpage']);
+
+

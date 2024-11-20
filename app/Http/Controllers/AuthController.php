@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
@@ -27,9 +28,13 @@ class AuthController extends Controller
         ]);
     
         if (FacadesAuth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('user.index')->with('status', 'Login successful!');
+            if(FacadesAuth::user()->role == 'admin'){
+                return redirect()->route('user.index')->with('status', 'Login successful!');
+            }else{
+                return redirect('/user-tasks')->with('status', 'Login successful!');
+            }
         }
-    
+        
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ]);
@@ -51,8 +56,12 @@ class AuthController extends Controller
         ]);
     
         FacadesAuth::login($user);
-    
-        return redirect()->route('user.index')->with('status', 'Registration successful!');
+
+        if(Auth::user()->role == 'admin'){
+            return redirect()->route('user.index')->with('status', 'Registration successful!');
+        }else{
+            return redirect()->route('userpage.index')->with('status', 'Registration successful!!');
+        }
     }
 
     public function regenerate(){

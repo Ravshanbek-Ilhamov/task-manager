@@ -69,22 +69,40 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <a href="/users" class="nav-link">
-            <i class="nav-icon fas fa-chart-pie"></i>
-            <p>Users</p>
-          </a>
-          <a href="/areas" class="nav-link">
-            <i class="nav-icon fas fa-chart-pie"></i>
-            <p>Areas</p>
-          </a>
-          <a href="/categories" class="nav-link">
-            <i class="nav-icon fas fa-chart-pie"></i>
-            <p>Categories</p>
-          </a>
+                    
+          @if (auth()->user()->role == 'admin')
           <a href="/tasks" class="nav-link">
             <i class="nav-icon fas fa-chart-pie"></i>
             <p>Tasks</p>
           </a>
+
+          <a href="/users" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Users</p>
+          </a>
+
+          <a href="/areas" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Areas</p>
+          </a>
+
+          <a href="/categories" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Categories</p>
+          </a>
+
+          <a href="/responses" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Task Responses</p>
+          </a>
+          @elseif (auth()->user()->role == 'user')
+
+          <a href="/user-tasks" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>My Tasks</p>
+          </a>
+
+          @endif
         </ul>
       </nav>
     </div>

@@ -20,10 +20,13 @@ class Area extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-
     public function taskArea(){
         return $this->hasMany(TaskArea::class);
     }
 
+
+    public function responses(){
+        return $this->hasMany(Response::class);
+    }
 
 }

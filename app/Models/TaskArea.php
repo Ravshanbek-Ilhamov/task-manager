@@ -11,6 +11,8 @@ class TaskArea extends Model
     use HasFactory;
 
     protected $fillable  = [
+        'category_id',
+        'period',
         'area_id',
         'task_id',
         'status',

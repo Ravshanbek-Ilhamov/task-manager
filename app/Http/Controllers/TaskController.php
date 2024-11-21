@@ -134,25 +134,40 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-
         $filePath = null;
+    
+        // Handle file upload if present
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filePath = $file->store('tasks', 'public'); 
+            $filePath = $file->store('tasks', 'public');
         }
-        
+    
+        // Create the task
         $task = Task::create([
             'category_id' => $request->category_id,
             'performer' => $request->performer,
             'title' => $request->title,
             'period' => $request->period,
-            'file' => $filePath, 
+            'file' => $filePath,
         ]);
-        
-        $task->areas()->attach($request->area_id);
     
+        // Prepare TaskArea entries
+        $regionTasks = collect($request->area_id)->map(function ($area_id) use ($request, $task) {
+            return [
+                'area_id' => $area_id, // Use the individual area_id
+                'task_id' => $task->id,
+                'category_id' => $request->category_id,
+                'period' => $request->period,
+            ];
+        });
+    
+        // Insert TaskArea entries
+        TaskArea::insert($regionTasks->toArray());
+    
+        // Redirect with success message
         return redirect('/tasks')->with('success', 'Task created successfully.');
     }
+    
       
     /**
      * Display the specified resource.

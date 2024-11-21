@@ -104,7 +104,7 @@
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
-                </div>
+                </div>\
             </div>
         
         <a href="{{ route('tasks.create') }}" class='btn btn-primary m-2'>Create Task</a>

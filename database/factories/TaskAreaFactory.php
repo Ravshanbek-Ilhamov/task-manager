@@ -19,6 +19,8 @@ class TaskAreaFactory extends Factory
     public function definition(): array
     {
         return [
+            'category_id' => fake()->numberBetween(1,10),
+            'period' => fake()->date(),
             'area_id' =>fake()->numberBetween(1,10),
             'task_id' =>fake()->numberBetween(1,20),
             'status' => Arr::random(['sent', 'opened', 'done', 'rejected', 'approved']),

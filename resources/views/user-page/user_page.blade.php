@@ -3,6 +3,31 @@
 @section('title', 'User Task List')
 
 @section('content')
+@php
+    use Carbon\Carbon;
+    use App\Models\TaskArea;
+
+    
+    $user = Auth::user()->area->id;
+    $all = TaskArea::where('area_id',$user)->count();
+    
+    $todays = TaskArea::whereDate('period', '=', Carbon::today())
+                ->where('area_id',$user)->count();
+
+    $oneDay = TaskArea::whereDate('period', '=', Carbon::tomorrow())
+                ->where('area_id',$user)->count();
+
+    $twoDays = TaskArea::whereBetween('period', [Carbon::today(), Carbon::today()->addDays(2)])
+                ->where('area_id',$user)->count();
+
+    $expired = TaskArea::whereDate('period', '<', Carbon::today())
+                ->where('area_id',$user)->count();
+
+    // dd($all,$todays,$oneDay,$twoDays,$expired);
+// dd(124)
+
+@endphp
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div class="content-wrapper">
@@ -26,8 +51,9 @@
                     </button>
                 </div>
             @endif
-            {{-- <h5 class="mb-2 mt-4">Small Box</h5>
-            <div class="row no-gutters">
+
+             <h5 class="mb-2 mt-4">Small Box</h5>
+             <div class="row no-gutters">
                 <!-- All Tasks -->
                 <div class="col-lg-2 col-6 mx-4">
                     <div class="small-box bg-info">
@@ -38,7 +64,7 @@
                         <div class="icon">
                             <i class="fas fa-shopping-cart"></i>
                         </div>
-                        <a href="{{ url('/filter-tasks/all') }}" class="small-box-footer">
+                        <a href="{{ url('/user-tasks/filter/all') }}" class="small-box-footer">
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -48,13 +74,13 @@
                 <div class="col-lg-2 col-6 mx-3">
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h5>{{$twodays}} Tasks</h5>
+                            <h5>{{$twoDays}} Tasks</h5>
                             <p>Tasks within 2 days</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-stats-bars"></i>
                         </div>
-                        <a href="{{ url('/filter-tasks/twodays') }}" class="small-box-footer">
+                        <a href="{{ url('/user-tasks/filter/twodays') }}" class="small-box-footer">
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -64,13 +90,13 @@
                 <div class="col-lg-2 col-6 mx-3">
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h5>{{$onedays}} Tasks</h5>
+                            <h5>{{$oneDay}} Tasks</h5>
                             <p>Tasks For Tomorrow</p>
                         </div>
                         <div class="icon">
                             <i class="fas fa-user-plus"></i>
                         </div>
-                        <a href="{{ url('/filter-tasks/tomorrow') }}" class="small-box-footer">
+                        <a href="{{ url('/user-tasks/filter/tomorrow') }}" class="small-box-footer">
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -86,39 +112,33 @@
                         <div class="icon">
                             <i class="fas fa-chart-pie"></i>
                         </div>
-                        <a href="{{ url('/filter-tasks/today') }}" class="small-box-footer">
+                        <a href="{{ url('/user-tasks/filter/today') }}" class="small-box-footer">
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
                 </div>
             
                 <!-- Expired Tasks -->
-                {{-- <div class="col-lg-2 col-6 mx-3 mx-3">
+                <div class="col-lg-2 col-6 mx-3 mx-3">
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h5>{{ $taskCounts['expired'] }} Tasks</h5>
+                            <h5>{{ $expired }} Tasks</h5>
                             <p>Tasks that expired now</p>
                         </div>
                         <div class="icon">
                             <i class="fas fa-chart-pie"></i>
                         </div>
-                        <a href="{{ url('/user-tasks?filter=expired') }}" class="small-box-footer">
+                        <a href="{{ url('/user-tasks/filter/expired') }}" class="small-box-footer">
                             See All <i class="fas fa-arrow-circle-right"></i>
                         </a>
                     </div>
-                </div> --}
-            {{-- </div> --}} 
+                </div>
+            </div>
+            
 
-            @php
-                dd($tasks->areas);
-                // dd($tasks);
-                
-            @endphp
 
             <div class="row my-3">
-                {{-- <form method="GET" action="{{ route('responses.page') }}" class="form-inline"> --}}
-                <form method="GET" action="{{ url('/user-tasks') }}" class="form-inline">
-
+                <form method="GET" action="{{ route('user.tasks.filter') }}" class="form-inline">
                     <div class="form-group mr-2 mt-4">
                         <label for="start_date" class="mr-2">Start Date:</label>
                         <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
@@ -129,9 +149,10 @@
                     </div>
                     <button type="submit" class="btn btn-primary mt-4">Filter</button>
                 </form>
-
             </div>
-                @if($tasks->isEmpty())
+            
+
+                @if($taskAreas->isEmpty())
                     <p>No responses found for the selected date range.</p>
                 @else
                     <table class="table table-striped table-bordered">
@@ -150,122 +171,82 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($tasks as $task)
-                            @foreach ($tasks->areas as $area)
+                            @foreach ($taskAreas as $taskArea)
                             <tr>
-                                    
-
-                                    <td>{{$task->id}}</td>
-                                    <td>{{$task->area->name}}</td>
-                                    <td>{{$task->title}}</td>
-                                    <td>{{$task->performer}}</td>
-                                    <td>{{$task->categories->name}}</td>
-                                    <td>{{$task->file}}</td>
-                                    <td>{{$task->period}}</td>
+                                    <td>{{$taskArea->tasks->id}}</td>
                                     <td>
-
-                                        @if ($task->tasks && $task->tasks->responses && $task->tasks->responses->isNotEmpty())
-                                            {{ $task->tasks->responses->first() }}
-                                        @endif
-
+                                        <span class="badge badge-info">{{ $taskArea->areas->name }}</span>
                                     </td>
-                                    
-                                    <td>{{$task->status}}</td>
-                            </tr> 
-                            @endforeach
-
-
-                            {{-- @php
-                                dd($taskArea);
-                            @endphp --}}
-                                {{-- @foreach ($taskArea->tasks as $task) --}}
-                                    {{-- @foreach ($taskArea->tasks->areas as $area) --}}
-                                        {{-- @php
-                                            $taskAreaStatus = $taskArea; // The current TaskArea already matches
-                                            $taskComment = $task->responses
-                                                ->where('area_id', $area->id)
-                                                ->where('task_id', $task->id)
-                                                ->first();
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $task->id }}</td>
-                                            <td>
-                                                <span class="badge badge-info">{{ $area->name }}</span>
-                                            </td>
-                                            <td>{{ $task->title }}</td>
-                                            <td>{{ $task->performer }}</td>
-                                            <td>{{ $task->categories->name }}</td>
-                                            <td>
-                                                @if ($task->file)
-                                                    <a href="{{ asset('storage/' . $task->file) }}" target="_blank">View File</a>
-                                                @else
-                                                    No File
-                                                @endif
-                                            </td>
-                                            <td>{{ $task->period }}</td>
-                                            <td>
-                                                @if ($taskComment && $taskComment->comment)
-                                                    {{ $taskComment->comment }}
-                                                @else
-                                                    No Comment
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($taskAreaStatus->status == 'sent')
-                                                    <form method="POST" action="{{ route('tasks.open', $taskAreaStatus->id) }}" style="display:inline;">
+                                    <td>{{$taskArea->tasks->title}}</td>
+                                    <td>{{$taskArea->tasks->performer}}</td>
+                                    <td>{{$taskArea->tasks->categories->name}}</td>
+                                    <td>
+                                        @if ($taskArea->tasks->file)
+                                            <a href="{{ asset('storage/' . $taskArea->tasks->file) }}" target="_blank">View File</a>
+                                        @else
+                                            No File
+                                        @endif
+                                    </td>
+                                    <td>{{$taskArea->tasks->period}}</td>
+                                    <td>
+                                        @if ($taskArea->tasks && $taskArea->tasks->responses && $taskArea->tasks->responses->isNotEmpty())
+                                            {{ $taskArea->tasks->responses->first()->comment }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($taskArea->status == 'sent')
+                                        <form method="POST" action="{{ route('tasks.open', $taskArea->id) }}" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-info">Open</button>
+                                        </form>
+                                        @elseif ($taskArea->status == 'done')
+                                            <button type="button" class="btn btn-outline-success disabled">Done</button>
+                                        @elseif ($taskArea->status == 'approved')
+                                            <button type="button" class="btn btn-success disabled">Approved</button>
+                                        @else
+                                            <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#doTaskModal-{{ $taskArea->id }}">
+                                                Do
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="doTaskModal-{{ $taskArea->id }}" tabindex="-1" aria-labelledby="doTaskLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <form method="POST" action="{{ route('tasks.do', $taskArea->id) }}" enctype="multipart/form-data">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-outline-info">Open</button>
-                                                    </form>
-                                                @elseif ($taskAreaStatus->status == 'done')
-                                                    <button type="button" class="btn btn-outline-success disabled">Done</button>
-                                                @elseif ($taskAreaStatus->status == 'approved')
-                                                    <button type="button" class="btn btn-success disabled">Approved</button>
-                                                @else
-                                                    <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#doTaskModal-{{ $taskAreaStatus->id }}">
-                                                        Do
-                                                    </button>
-                                                    <!-- Modal -->
-                                                    <div class="modal fade" id="doTaskModal-{{ $taskAreaStatus->id }}" tabindex="-1" aria-labelledby="doTaskLabel" aria-hidden="true">
-                                                        <div class="modal-dialog">
-                                                            <form method="POST" action="{{ route('tasks.do', $taskAreaStatus->id) }}" enctype="multipart/form-data">
-                                                                @csrf
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">Complete Task</h5>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="form-group">
-                                                                            <label for="note">Note</label>
-                                                                            <textarea name="note" id="note" class="form-control" required></textarea>
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label for="file">File input</label>
-                                                                            <div class="custom-file">
-                                                                                <input type="file" name="file" class="custom-file-input" id="file">
-                                                                                <label class="custom-file-label" for="file">Choose file</label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                        <button type="submit" class="btn btn-primary">Submit Task</button>
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Complete Task</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <label for="note">Note</label>
+                                                                    <textarea name="note" id="note" class="form-control" required></textarea>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="file">File input</label>
+                                                                    <div class="custom-file">
+                                                                        <input type="file" name="file" class="custom-file-input" id="file">
+                                                                        <label class="custom-file-label" for="file">Choose file</label>
                                                                     </div>
                                                                 </div>
-                                                            </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary">Submit Task</button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr> --}}
-                                    @endforeach
-                                {{-- @endforeach --}}
-                            {{-- @endforeach --}}
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </td>
+                            </tr> 
+                            @endforeach
                         </tbody>
                     </table>
-                    {{ $tasks->links() }}
+                    {{ $taskAreas->links() }}
                 @endif
         </div>
     </section>

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
             $table->string('status')->default('sent'); 
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->date('period'); 
             $table->timestamps();
         });
     }

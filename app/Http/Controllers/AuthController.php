@@ -57,7 +57,7 @@ class AuthController extends Controller
     
         FacadesAuth::login($user);
 
-        if(Auth::user()->role == 'admin'){
+        if(FacadesAuth::user()->role == 'admin'){
             return redirect()->route('user.index')->with('status', 'Registration successful!');
         }else{
             return redirect()->route('userpage.index')->with('status', 'Registration successful!!');

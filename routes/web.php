@@ -56,5 +56,5 @@ Route::patch('/responses/reject-with-comment', [TaskController::class, 'rejectWi
 
 
 Route::get('/user-tasks',[UserTaskController::class,'index']);
-
-
+Route::get('/user-tasks/filter', [UserTaskController::class, 'filterDate'])->name('user.tasks.filter');
+Route::get('/user-tasks/filter/{status}', [UserTaskController::class, 'takeFilterTask'])->name('user-tasks.filter');

@@ -21,101 +21,97 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $query = Task::query();
-        
+
         if (auth()->user()->role !== 'admin') {
             $userAreas = auth()->user()->areas->pluck('id');
             $query->whereHas('taskAreas', function ($query) use ($userAreas) {
                 $query->whereIn('area_id', $userAreas);
             });
         }
-    
+        
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('period', [$request->start_date, $request->end_date]);
+        } 
+
+        $filter = $request->input('filter');
+        if ($filter === 'today') {
+            $query->whereDate('period', today());
+        } elseif ($filter === 'tomorrow') {
+            $query->whereDate('period', today()->addDay());
+        } elseif ($filter === 'two_days') {
+            $query->whereBetween('period', [today(), today()->addDays(2)]);
+        } elseif ($filter === 'expired') {
+            $query->where('period', '<', today());
         }
-    
-        if ($request->has('filter')) {
-            switch ($request->filter) {
-                case 'today':
-                    $query->whereDate('period', '=', now()->toDateString()); // Tasks for today
-                    break;
-                case 'tomorrow':
-                    $query->whereDate('period', '=', now()->addDay()->toDateString()); // Tasks for tomorrow
-                    break;
-                case 'two_days':
-                    $query->whereBetween('period', [now()->toDateString(), now()->addDays(2)->toDateString()]); // Tasks in 2 days
-                    break;
-                case 'expired':
-                    $query->whereDate('period', '<', now()->toDateString()); // Tasks that expired
-                    break;
-                default:
-                    break;
-            }
-        }
-    
+        
         $taskCounts = [
             'all' => $query->count(),
-            'today' => $query->whereDate('period', now()->toDateString())->count(),
-            'tomorrow' => $query->whereDate('period', now()->addDay()->toDateString())->count(),
-            'two_days' => $query->whereBetween('period', [now()->toDateString(), now()->addDays(2)->toDateString()])->count(),
-            'expired' => $query->whereDate('period', '<', now()->toDateString())->count(),
+            'today' => $query->whereDate('period', today())->count(),
+            'tomorrow' => $query->whereDate('period', today()->addDay())->count(),
+            'two_days' => $query->whereBetween('period', [today(), today()->addDays(2)])->count(),
+            'expired' => $query->where('period', '<', today())->count(),
         ];
-    
+        
         $tasks = $query->paginate(10);
-
         return view('task.task', compact('tasks', 'taskCounts'));
+        
     }
     
 
-     public function userpage(Request $request)
-     {
-         $user = Auth::user();
-         $startDate = $request->input('start_date');
-         $endDate = $request->input('end_date');
-     
-         $tasksQuery = Task::whereHas('taskAreas', function ($query) use ($user) {
-             $query->whereIn('area_id', $user->areas->pluck('id'));
-         });
-         
+      
+        public function filter($filter){
+        // $filter = 'tomorrow';    
+        $area_id = Auth::user()->areas->first()->id;
 
-         $taskCounts = [
-             'all' => $tasksQuery->count(),
-             'today' => $tasksQuery->whereDate('period', today())->count(),
-             'tomorrow' => $tasksQuery->whereDate('period', today()->addDay())->count(),
-             'two_days' => $tasksQuery->whereBetween('period', [today(), today()->addDays(2)])->count(),
-             'expired' => $tasksQuery->where('period', '<', today())->count(),
-         ];
+        $all = TaskArea::where('area_id',$area_id)->count();
 
-         $tasksQuery = Task::whereHas('taskAreas', function ($query) use ($user) {
-             $query->whereIn('area_id', $user->areas->pluck('id'));
-         });
-     
-         $filter = $request->input('filter');
-         if ($filter) {
-             if ($filter === 'today') {
-                 $tasksQuery->whereDate('period', today());
-             } elseif ($filter === 'tomorrow') {
-                 $tasksQuery->whereDate('period', today()->addDay());
-             } elseif ($filter === 'two_days') {
-                 $tasksQuery->whereBetween('period', [today(), today()->addDays(2)]);
-             } elseif ($filter === 'expired') {
-                 $tasksQuery->where('period', '<', today());
-             }
-         }
-     
-         if ($startDate && $endDate) {
-             $tasksQuery->whereDate('period', '>=', $startDate)
-                        ->whereDate('period', '<=', $endDate);
-         }
-     
-         $tasks = $tasksQuery->paginate(10);
-     
-         return view('user-page.user_page', compact('tasks', 'taskCounts'));
-     }
-     
-     
-     
-     
-    public function open(Request $request, TaskArea $taskArea)
+        $twodays = TaskArea::where('area_id',$area_id)
+            ->whereHas('tasks',function($query){
+                $query->whereDate('period',now()->addDays(2));
+                })->count();
+            
+        $onedays = TaskArea::where('area_id',$area_id)
+                ->whereHas('tasks',function($query){
+                    $query->whereDate('period',now()->addDays(1));
+                    })->count();
+
+        $todays = TaskArea::where('area_id',$area_id)
+                    ->whereHas('tasks',function($query){
+                        $query->whereDate('period',now()->addDays(0));
+                    })->count();
+
+        $tasks = TaskArea::paginate(100);
+
+        if($filter == 'twodays'){
+            $tasks = TaskArea::where('area_id',$area_id)
+                ->whereHas('tasks',function($query){
+                    $query->whereDate('period',now()->addDays(2));
+                })->paginate(100);
+
+        }elseif ($filter == 'tomorrow'){
+            $tasks = TaskArea::where('area_id',$area_id)
+                ->whereHas('tasks',function($query){
+                    $query->whereDate('period',now()->addDays(1));
+                })->paginate(100);
+
+        }elseif($filter == 'today'){
+            $tasks = TaskArea::where('area_id',$area_id)
+                ->whereHas('tasks',function($query){
+                    $query->whereDate('period',now()->addDays(0));
+                })->paginate(100);
+        }
+
+        dd($area_id);
+        return view('user-page.user_page',[
+            'all'=>$all,
+            'twodays'=> $twodays,
+            'onedays'=>$onedays,
+            'todays'=>$todays,
+            'tasks' => $tasks]);
+        }    
+    
+   
+        public function open(Request $request, TaskArea $taskArea)
     {
         $taskArea->status = 'opened';
         $taskArea->save();

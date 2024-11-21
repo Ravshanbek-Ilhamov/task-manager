@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\TaskAreaController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserTaskController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -43,7 +44,7 @@ Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 Route::resource('tasks', TaskController::class);
 Route::resource('taskAreas', TaskAreaController::class);
 
-
+Route::get('filter-tasks/{filter}',[TaskController::class,'filter']);
 
 Route::get('/responses', [TaskController::class, 'response_page'])->name('response.index');
 Route::post('/tasks/{taskAreaStatus}/open', [TaskController::class, 'openTask'])->name('tasks.open');
@@ -53,6 +54,7 @@ Route::patch('/responses/{id}/reject', [TaskController::class, 'reject'])->name(
 Route::get('/responses', [TaskController::class, 'response_page'])->name('responses.page');
 Route::patch('/responses/reject-with-comment', [TaskController::class, 'rejectWithComment'])->name('responses.rejectWithComment');
 
-Route::get('/user-tasks',[TaskController::class,'userpage']);
+
+Route::get('/user-tasks',[UserTaskController::class,'index']);
 
 

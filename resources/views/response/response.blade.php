@@ -29,8 +29,8 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Title</th>
                         <th>Area</th>
+                        <th>Title</th>
                         <th>Task</th>
                         <th>File</th>
                         <th>Status</th>
@@ -41,11 +41,46 @@
                     @foreach ($responses as $response)
                         <tr>
                             <td>{{ $response->id }}</td>
-                            <td>{{ $response->title }}</td>
                             <td>
-                                <span class="badge badge-info">{{ $response->area->name ?? 'N/A' }}</span>
+                                <span style="font-size:16px" class="badge badge-info">{{ $response->area->name ?? 'N/A' }}</span>
                             </td>
-                            <td>{{ $response->task->title ?? 'N/A' }}</td>
+                            <td>{{ ucfirst($response->title) }}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm task-btn" data-toggle="modal" data-target="#taskModal" 
+                                        data-task-title="{{ $response->task->title ?? 'N/A' }}"
+                                        data-category="{{ $response->task->categories->name ?? 'N/A' }}"
+                                        data-performer="{{ $response->task->performer ?? 'N/A' }}"
+                                        data-file="{{ $response->task->file ?? 'N/A' }}"
+                                        data-period="{{ $response->task->period ?? 'N/A' }}">
+                                    View Task
+                                </button>
+                                <!-- Task Details Modal -->
+                                <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="taskModalLabel">Task Details</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div>
+                                                    <p><strong>Title:</strong> <span id="modal-task-title">N/A</span></p>
+                                                    <p><strong>Category:</strong> <span id="modal-category">N/A</span></p>
+                                                    <p><strong>Performer:</strong> <span id="modal-performer">N/A</span></p>
+                                                    <p><strong>Period:</strong> <span id="modal-period">N/A</span></p>
+                                                    <p><strong>File:</strong> <span id="modal-file">N/A</span></p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            
                             <td>
                                 @if ($response->file)
                                     <a href="{{ asset('storage/' . $response->file) }}" target="_blank">View File</a>
@@ -54,7 +89,7 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge badge-{{ $response->status == 'approved' ? 'success' : ($response->status == 'rejected' ? 'danger' : 'secondary') }}">
+                                <span style="font-size:16px" class="badge badge-{{ $response->status == 'approved' ? 'success' : ($response->status == 'rejected' ? 'danger' : 'secondary') }}">
                                     {{ ucfirst($response->status) }}
                                 </span>
                             </td>
@@ -120,7 +155,24 @@
         </div>
     </section>
 </div>
+
+
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const taskButtons = document.querySelectorAll('.task-btn');
+    taskButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            document.getElementById('modal-task-title').textContent = this.getAttribute('data-task-title');
+            document.getElementById('modal-category').textContent = this.getAttribute('data-category');
+            document.getElementById('modal-performer').textContent = this.getAttribute('data-performer');
+            const fileLink = this.getAttribute('data-file');
+            document.getElementById('modal-file').innerHTML = fileLink ? 
+                `<a href="/storage/${fileLink}" target="_blank">View File</a>` : 'No File';
+            document.getElementById('modal-period').textContent = this.getAttribute('data-period');
+        });
+    });
+});
+
     document.addEventListener("DOMContentLoaded", function () {
         // Attach event listeners to all reject buttons
         const rejectButtons = document.querySelectorAll('.reject-btn');

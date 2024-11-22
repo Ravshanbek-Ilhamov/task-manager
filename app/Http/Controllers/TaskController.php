@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Response;
 use App\Models\Task;
 use App\Models\TaskArea;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -20,99 +21,58 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Task::query();
+                
+        $taskAreas = TaskArea::paginate(10);
+        return view('task.task', compact('taskAreas'));
 
-        if (auth()->user()->role !== 'admin') {
-            $userAreas = auth()->user()->areas->pluck('id');
-            $query->whereHas('taskAreas', function ($query) use ($userAreas) {
-                $query->whereIn('area_id', $userAreas);
-            });
-        }
-        
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('period', [$request->start_date, $request->end_date]);
-        } 
-
-        $filter = $request->input('filter');
-        if ($filter === 'today') {
-            $query->whereDate('period', today());
-        } elseif ($filter === 'tomorrow') {
-            $query->whereDate('period', today()->addDay());
-        } elseif ($filter === 'two_days') {
-            $query->whereBetween('period', [today(), today()->addDays(2)]);
-        } elseif ($filter === 'expired') {
-            $query->where('period', '<', today());
-        }
-        
-        $taskCounts = [
-            'all' => $query->count(),
-            'today' => $query->whereDate('period', today())->count(),
-            'tomorrow' => $query->whereDate('period', today()->addDay())->count(),
-            'two_days' => $query->whereBetween('period', [today(), today()->addDays(2)])->count(),
-            'expired' => $query->where('period', '<', today())->count(),
-        ];
-        
-        $tasks = $query->paginate(10);
-        return view('task.task', compact('tasks', 'taskCounts'));
-        
     }
-    
 
-      
-        public function filter($filter){
-        // $filter = 'tomorrow';    
-        $area_id = Auth::user()->areas->first()->id;
+    public function filterDate(Request $request){
 
-        $all = TaskArea::where('area_id',$area_id)->count();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+        
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        $taskAreas = TaskArea::whereBetween('period', [$startDate, $endDate])->paginate(10);
+        return view('task.task', compact('taskAreas'));
+    }    
 
-        $twodays = TaskArea::where('area_id',$area_id)
-            ->whereHas('tasks',function($query){
-                $query->whereDate('period',now()->addDays(2));
-                })->count();
-            
-        $onedays = TaskArea::where('area_id',$area_id)
-                ->whereHas('tasks',function($query){
-                    $query->whereDate('period',now()->addDays(1));
-                    })->count();
+    public function takeFilterTask(string $status)    {
+        
+        // $userAreaId = Auth::user()->area->id;
 
-        $todays = TaskArea::where('area_id',$area_id)
-                    ->whereHas('tasks',function($query){
-                        $query->whereDate('period',now()->addDays(0));
-                    })->count();
-
-        $tasks = TaskArea::paginate(100);
-
-        if($filter == 'twodays'){
-            $tasks = TaskArea::where('area_id',$area_id)
-                ->whereHas('tasks',function($query){
-                    $query->whereDate('period',now()->addDays(2));
-                })->paginate(100);
-
-        }elseif ($filter == 'tomorrow'){
-            $tasks = TaskArea::where('area_id',$area_id)
-                ->whereHas('tasks',function($query){
-                    $query->whereDate('period',now()->addDays(1));
-                })->paginate(100);
-
-        }elseif($filter == 'today'){
-            $tasks = TaskArea::where('area_id',$area_id)
-                ->whereHas('tasks',function($query){
-                    $query->whereDate('period',now()->addDays(0));
-                })->paginate(100);
+        switch ($status) {
+            case 'all':
+                $taskAreas = TaskArea::paginate(10);
+                break;
+            case 'today':
+                $taskAreas = TaskArea::whereDate('period', '=', Carbon::today())
+                    ->paginate(10);
+                break;
+            case 'tomorrow':
+                $taskAreas = TaskArea::whereDate('period', '=', Carbon::tomorrow())
+                    ->paginate(10);
+                break;
+            case 'twodays':
+                $taskAreas = TaskArea::whereBetween('period', [Carbon::today(), Carbon::today()->addDays(2)])
+                    ->paginate(10);
+                break;
+            case 'expired':
+                $taskAreas = TaskArea::whereDate('period', '<', Carbon::today())
+                    ->paginate(10);
+                break;
+            default:
+                $taskAreas = collect();
         }
+        return view('task.task', compact('taskAreas'));
+    }      
 
-        dd($area_id);
-        return view('user-page.user_page',[
-            'all'=>$all,
-            'twodays'=> $twodays,
-            'onedays'=>$onedays,
-            'todays'=>$todays,
-            'tasks' => $tasks]);
-        }    
-    
-   
-        public function open(Request $request, TaskArea $taskArea)
-    {
+
+    public function open(Request $request, TaskArea $taskArea)    {
         $taskArea->status = 'opened';
         $taskArea->save();
 
@@ -136,13 +96,11 @@ class TaskController extends Controller
     {
         $filePath = null;
     
-        // Handle file upload if present
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filePath = $file->store('tasks', 'public');
         }
     
-        // Create the task
         $task = Task::create([
             'category_id' => $request->category_id,
             'performer' => $request->performer,
@@ -151,22 +109,21 @@ class TaskController extends Controller
             'file' => $filePath,
         ]);
     
-        // Prepare TaskArea entries
         $regionTasks = collect($request->area_id)->map(function ($area_id) use ($request, $task) {
             return [
-                'area_id' => $area_id, // Use the individual area_id
+                'area_id' => $area_id,
                 'task_id' => $task->id,
                 'category_id' => $request->category_id,
                 'period' => $request->period,
             ];
         });
     
-        // Insert TaskArea entries
         TaskArea::insert($regionTasks->toArray());
     
-        // Redirect with success message
         return redirect('/tasks')->with('success', 'Task created successfully.');
     }
+
+
     
       
     /**

@@ -3,11 +3,114 @@
 @section('title', 'User Task List')
 
 @section('content')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* Button Styles */
+    .btn-action {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        min-width: 120px;
+        border-radius: 6px;
+    }
+    
+    .btn-action:not(.disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-action.disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    /* Modal Styles */
+    .task-modal .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .task-modal .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem;
+    }
+    
+    .task-modal .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .task-modal .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem;
+    }
+    
+    .task-modal .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .task-modal .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .task-modal .custom-file-label {
+        padding: 0.75rem;
+        border-radius: 6px;
+        height: auto;
+    }
+    
+    .task-modal .custom-file-input:focus ~ .custom-file-label {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    /* Button hover states */
+    .btn-outline-info:hover {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    /* Additional animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .task-modal.show {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* File input enhancement */
+    .custom-file {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .custom-file-input:lang(en)~.custom-file-label::after {
+        content: "Browse";
+    }
+</style>
 @php
     use Carbon\Carbon;
     use App\Models\TaskArea;
 
-    
     $user = Auth::user()->area->id;
     $all = TaskArea::where('area_id',$user)->count();
     
@@ -24,11 +127,8 @@
                 ->where('area_id',$user)->count();
 
     // dd($all,$todays,$oneDay,$twoDays,$expired);
-// dd(124)
 
 @endphp
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div class="content-wrapper">
     <section class="content">
@@ -135,8 +235,6 @@
                 </div>
             </div>
             
-
-
             <div class="row my-3">
                 <form method="GET" action="{{ route('user.tasks.filter') }}" class="form-inline">
                     <div class="form-group mr-2 mt-4">
@@ -150,8 +248,6 @@
                     <button type="submit" class="btn btn-primary mt-4">Filter</button>
                 </form>
             </div>
-            
-
                 @if($taskAreas->isEmpty())
                     <p>No responses found for the selected date range.</p>
                 @else
@@ -182,66 +278,104 @@
                                     <td>{{$taskArea->tasks->categories->name}}</td>
                                     <td>
                                         @if ($taskArea->tasks->file)
-                                            <a href="{{ asset('storage/' . $taskArea->tasks->file) }}" target="_blank">View File</a>
+                                            <a href="{{ asset('storage/' . $taskArea->tasks->file) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                <i class="fas fa-file-download mr-1"></i> View
+                                            </a>
                                         @else
-                                            No File
+                                            <span class="text-muted">No file</span>
                                         @endif
                                     </td>
-                                    <td>{{$taskArea->tasks->period}}</td>
+                                    <td>{{$taskArea->period}}</td>
                                     <td>
                                         @if ($taskArea->tasks && $taskArea->tasks->responses && $taskArea->tasks->responses->isNotEmpty())
                                             {{ $taskArea->tasks->responses->first()->comment }}
                                         @endif
-                                    </td>
-                                    <td>
-                                        @if ($taskArea->status == 'sent')
-                                        <form method="POST" action="{{ route('tasks.open', $taskArea->id) }}" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline-info">Open</button>
-                                        </form>
-                                        @elseif ($taskArea->status == 'done')
-                                            <button type="button" class="btn btn-outline-success disabled">Done</button>
-                                        @elseif ($taskArea->status == 'approved')
-                                            <button type="button" class="btn btn-success disabled">Approved</button>
-                                        @else
-                                            <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#doTaskModal-{{ $taskArea->id }}">
-                                                Do
-                                            </button>
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="doTaskModal-{{ $taskArea->id }}" tabindex="-1" aria-labelledby="doTaskLabel" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <form method="POST" action="{{ route('tasks.do', $taskArea->id) }}" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Complete Task</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="form-group">
-                                                                    <label for="note">Note</label>
-                                                                    <textarea name="note" id="note" class="form-control" required></textarea>
+                                        <td class="task-actions">
+                                            @if ($taskArea->status == 'sent')
+                                                <form method="POST" action="{{ route('tasks.open', $taskArea->id) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-info btn-action">
+                                                        <i class="fas fa-envelope-open mr-1"></i>
+                                                        <span>Open</span>
+                                                    </button>
+                                                </form>
+                                            @elseif ($taskArea->status == 'done')
+                                                <button type="button" class="btn btn-outline-success btn-action disabled">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                    <span>Done</span>
+                                                </button>
+                                            @elseif ($taskArea->status == 'approved')
+                                                <button type="button" class="btn btn-success btn-action disabled">
+                                                    <i class="fas fa-trophy mr-1"></i>
+                                                    <span>Approved</span>
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn btn-outline-warning btn-action" data-toggle="modal" data-target="#doTaskModal-{{ $taskArea->id }}">
+                                                    <i class="fas fa-play-circle mr-1"></i>
+                                                    <span>Do Task</span>
+                                                </button>
+                                                
+                                                <!-- Enhanced Modal -->
+                                                <div class="modal fade task-modal" id="doTaskModal-{{ $taskArea->id }}" tabindex="-1" aria-labelledby="doTaskLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <form method="POST" action="{{ route('tasks.do', $taskArea->id) }}" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <div class="modal-content">
+                                                                <div class="modal-header bg-light">
+                                                                    <h5 class="modal-title">
+                                                                        <i class="fas fa-clipboard-check mr-2"></i>
+                                                                        Complete Task
+                                                                    </h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="file">File input</label>
-                                                                    <div class="custom-file">
-                                                                        <input type="file" name="file" class="custom-file-input" id="file">
-                                                                        <label class="custom-file-label" for="file">Choose file</label>
+                                                                <div class="modal-body">
+                                                                    <div class="form-group mb-4">
+                                                                        <label for="note" class="font-weight-bold">
+                                                                            <i class="fas fa-comment-alt mr-2"></i>
+                                                                            Task Notes
+                                                                        </label>
+                                                                        <textarea 
+                                                                            name="note" 
+                                                                            id="note" 
+                                                                            class="form-control" 
+                                                                            rows="4" 
+                                                                            required 
+                                                                            placeholder="Enter your notes about the task completion..."
+                                                                        ></textarea>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="file" class="font-weight-bold">
+                                                                            <i class="fas fa-paperclip mr-2"></i>
+                                                                            Attachment
+                                                                        </label>
+                                                                        <div class="custom-file">
+                                                                            <input type="file" name="file" class="custom-file-input" id="file">
+                                                                            <label class="custom-file-label" for="file">Choose file</label>
+                                                                        </div>
+                                                                        <small class="form-text text-muted mt-2">
+                                                                            <i class="fas fa-info-circle mr-1"></i>
+                                                                            Supported formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (max 10MB)
+                                                                        </small>
                                                                     </div>
                                                                 </div>
+                                                                <div class="modal-footer bg-light">
+                                                                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                                                                        <i class="fas fa-times mr-1"></i>
+                                                                        Cancel
+                                                                    </button>
+                                                                    <button type="submit" class="btn btn-primary">
+                                                                        <i class="fas fa-paper-plane mr-1"></i>
+                                                                        Submit Task
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-primary">Submit Task</button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        </form>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        @endif
-                                    </td>
+                                            @endif
+                                        </td>
                             </tr> 
                             @endforeach
                         </tbody>
@@ -252,7 +386,17 @@
     </section>
 </div>
 
-
+                                        
+<script>
+    // Update file input label with selected filename
+    document.querySelectorAll('.custom-file-input').forEach(input => {
+        input.addEventListener('change', function(e) {
+            const fileName = this.files[0].name;
+            const label = this.nextElementSibling;
+            label.innerText = fileName;
+        });
+    });
+    </script>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>document.addEventListener("DOMContentLoaded", function() {

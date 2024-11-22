@@ -10,21 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class UserTaskController extends Controller
 {
-    
-    public function index(Request $request)
+    public function index()
     {
         if(Auth::user()->area){
             $user = Auth::user()->area->id;
 
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
-    
             $taskAreas = TaskArea::where('area_id',$user)->paginate(10);
-
-            if ($startDate && $endDate) {
-                $tasksQuery->where('period', '>=', $startDate)
-                           ->where('period', '<=', $endDate);
-            }
 
             return view('user-page.user_page', ['taskAreas' => $taskAreas]);
         }else{
@@ -43,9 +34,7 @@ class UserTaskController extends Controller
         $endDate = $request->input('end_date');
         $user = Auth::user();
         
-        $taskAreas = TaskArea::whereHas('tasks', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('period', [$startDate, $endDate]);
-            })
+        $taskAreas = TaskArea::whereBetween('period', [$startDate, $endDate])
             ->where('area_id', $user->area->id)->paginate(10);
         return view('user-page.user_page', compact('taskAreas'));
     }
@@ -55,6 +44,7 @@ class UserTaskController extends Controller
 
     public function takeFilterTask(string $status)
     {
+        
         $userAreaId = Auth::user()->area->id;
 
         switch ($status) {

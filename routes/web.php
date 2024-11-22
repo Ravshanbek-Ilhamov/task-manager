@@ -43,6 +43,11 @@ Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 
 Route::resource('tasks', TaskController::class);
 Route::resource('taskAreas', TaskAreaController::class);
+Route::post('/tasks/filter', [TaskController::class, 'filterDate'])->name('tasks.filter');
+// Route::get('/tasks/filter', [TaskController::class, 'filterDate'])->name('tasks.filter');
+Route::get('/tasks/filter/{status}', [TaskController::class, 'takeFilterTask'])->name('user-tasks.filter');
+
+
 
 Route::get('filter-tasks/{filter}',[TaskController::class,'filter']);
 

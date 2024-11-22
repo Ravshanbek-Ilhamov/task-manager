@@ -101,6 +101,16 @@
             <p>Reset Your Data</p>
           </a>
 
+          <a href="/controll" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Control</p>
+          </a>
+
+          <a href="/reports" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Reports</p>
+          </a>
+
           @elseif (auth()->user()->role == 'user')
           
           <a href="/reset-user" class="nav-link">

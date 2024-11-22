@@ -89,7 +89,7 @@
                                <div class="icon">
                                    <i class="fas fa-shopping-cart"></i>
                                </div>
-                               <a href="{{ url('/tasks/filter/all') }}" class="small-box-footer">
+                               <a href="{{ url('/alltasks/filter/all') }}" class="small-box-footer">
                                    See All <i class="fas fa-arrow-circle-right"></i>
                                </a>
                            </div>
@@ -105,7 +105,7 @@
                                <div class="icon">
                                    <i class="ion ion-stats-bars"></i>
                                </div>
-                               <a href="{{ url('/tasks/filter/twodays') }}" class="small-box-footer">
+                               <a href="{{ url('/alltasks/filter/twodays') }}" class="small-box-footer">
                                    See All <i class="fas fa-arrow-circle-right"></i>
                                </a>
                            </div>
@@ -121,7 +121,7 @@
                                <div class="icon">
                                    <i class="fas fa-user-plus"></i>
                                </div>
-                               <a href="{{ url('/tasks/filter/tomorrow') }}" class="small-box-footer">
+                               <a href="{{ url('/alltasks/filter/tomorrow') }}" class="small-box-footer">
                                    See All <i class="fas fa-arrow-circle-right"></i>
                                </a>
                            </div>
@@ -137,7 +137,7 @@
                                <div class="icon">
                                    <i class="fas fa-chart-pie"></i>
                                </div>
-                               <a href="{{ url('/tasks/filter/today') }}" class="small-box-footer">
+                               <a href="{{ url('/alltasks/filter/today') }}" class="small-box-footer">
                                    See All <i class="fas fa-arrow-circle-right"></i>
                                </a>
                            </div>
@@ -153,7 +153,7 @@
                                <div class="icon">
                                    <i class="fas fa-chart-pie"></i>
                                </div>
-                               <a href="{{ url('/tasks/filter/expired') }}" class="small-box-footer">
+                               <a href="{{ url('/alltasks/filter/expired') }}" class="small-box-footer">
                                    See All <i class="fas fa-arrow-circle-right"></i>
                                </a>
                            </div>
@@ -161,7 +161,7 @@
                    </div>
 
                    <div class="row mx-2">
-                       <form method="POST" action="{{ route('tasks.filter') }}" class="form-inline">
+                       <form method="POST" action="{{ route('alltasks.filter') }}" class="form-inline">
                            @csrf
                            <div class="form-group mr-2 mt-4">
                                <label for="start_date" class="mr-2">Start Date:</label>

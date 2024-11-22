@@ -20,11 +20,9 @@ class TaskController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-                
+    {         
         $taskAreas = TaskArea::paginate(10);
         return view('task.task', compact('taskAreas'));
-
     }
 
     public function filterDate(Request $request){
@@ -66,6 +64,7 @@ class TaskController extends Controller
             default:
                 $taskAreas = collect();
         }
+
         return view('task.task', compact('taskAreas'));
     }      
 

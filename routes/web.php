@@ -5,6 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\ControllController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskAreaController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserTaskController;
@@ -43,8 +45,8 @@ Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 
 Route::resource('tasks', TaskController::class);
 Route::resource('taskAreas', TaskAreaController::class);
-Route::post('/tasks/filter', [TaskController::class, 'filterDate'])->name('tasks.filter');
-Route::get('/tasks/filter/{status}', [TaskController::class, 'takeFilterTask'])->name('user-tasks.filter');
+Route::post('/tasks/filter', [TaskController::class, 'filterDate'])->name('alltasks.filter');
+Route::get('/alltasks/filter/{status}', [TaskController::class, 'takeFilterTask'])->name('user-tasks.filter');
 
 Route::get('filter-tasks/{filter}',[TaskController::class,'filter']);
 
@@ -64,3 +66,11 @@ Route::get('/user-tasks/filter/{status}', [UserTaskController::class, 'takeFilte
 
 Route::get('/reset-user',[AuthController::class,'reset_page'])->name('reset.page');
 Route::put('/users/{id}', [AuthController::class, 'user_update'])->name('users.update');
+
+
+Route::get('/controll',[ControllController::class,'index'])->name('control.index');
+Route::get('/tasklar/{area}/{category}', [ControllController::class, 'showTasksByAreaAndCategory'])->name('tasks.byAreaAndCategory');
+Route::get('/filter/{status}', [ControllController::class, 'filterByStatus'])->name('controltasks.filter');
+
+Route::get('/reports',[ReportController::class,'index'])->name('report.index');
+

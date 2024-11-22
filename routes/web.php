@@ -44,10 +44,7 @@ Route::delete('/area/delete/{id}', [AreaController::class, 'destroy']);
 Route::resource('tasks', TaskController::class);
 Route::resource('taskAreas', TaskAreaController::class);
 Route::post('/tasks/filter', [TaskController::class, 'filterDate'])->name('tasks.filter');
-// Route::get('/tasks/filter', [TaskController::class, 'filterDate'])->name('tasks.filter');
 Route::get('/tasks/filter/{status}', [TaskController::class, 'takeFilterTask'])->name('user-tasks.filter');
-
-
 
 Route::get('filter-tasks/{filter}',[TaskController::class,'filter']);
 
@@ -63,3 +60,7 @@ Route::patch('/responses/reject-with-comment', [TaskController::class, 'rejectWi
 Route::get('/user-tasks',[UserTaskController::class,'index']);
 Route::get('/user-tasks/filter', [UserTaskController::class, 'filterDate'])->name('user.tasks.filter');
 Route::get('/user-tasks/filter/{status}', [UserTaskController::class, 'takeFilterTask'])->name('user-tasks.filter');
+
+
+Route::get('/reset-user',[AuthController::class,'reset_page'])->name('reset.page');
+Route::put('/users/{id}', [AuthController::class, 'user_update'])->name('users.update');

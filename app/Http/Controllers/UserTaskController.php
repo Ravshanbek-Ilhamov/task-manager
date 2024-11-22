@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
 use App\Models\TaskArea;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -42,8 +42,6 @@ class TaskController extends Controller
     }    
 
     public function takeFilterTask(string $status)    {
-        
-        // $userAreaId = Auth::user()->area->id;
 
         switch ($status) {
             case 'all':

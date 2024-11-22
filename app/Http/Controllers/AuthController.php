@@ -64,8 +64,23 @@ class AuthController extends Controller
         }
     }
 
-    public function regenerate(){
-        return view('regenerate_password');
+    public function reset_page(){
+        return view('user.reset_user');
+    }
+
+    public function user_update(Request $request, $id){
+        
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'required|min:5',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->email = $request->input('email');
+        $user->password = Hash::make($request->input('password'));
+        $user->save();
+
+        return redirect()->route('reset.page')->with('success', 'User updated successfully!');
     }
 
 }

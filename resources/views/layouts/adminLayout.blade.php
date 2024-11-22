@@ -95,8 +95,18 @@
             <i class="nav-icon fas fa-chart-pie"></i>
             <p>Task Responses</p>
           </a>
-          @elseif (auth()->user()->role == 'user')
 
+          <a href="/reset-user" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Reset Your Data</p>
+          </a>
+
+          @elseif (auth()->user()->role == 'user')
+          
+          <a href="/reset-user" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Reset Your Data</p>
+          </a>
           <a href="/user-tasks" class="nav-link">
             <i class="nav-icon fas fa-chart-pie"></i>
             <p>My Tasks</p>

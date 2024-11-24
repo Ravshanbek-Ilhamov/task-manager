@@ -26,6 +26,11 @@ class TaskArea extends Model
         return $this->belongsTo(Task::class,'task_id');
     }
 
+    public function categories(){
+        return $this->belongsTo(Category::class,'category_id');
+    }
+
+
 //     public function areas()
 // {
 //     return $this->belongsTo(Area::class, 'area_id');

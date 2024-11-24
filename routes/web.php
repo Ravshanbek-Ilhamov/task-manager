@@ -73,4 +73,6 @@ Route::get('/tasklar/{area}/{category}', [ControllController::class, 'showTasksB
 Route::get('/filter/{status}', [ControllController::class, 'filterByStatus'])->name('controltasks.filter');
 
 Route::get('/reports',[ReportController::class,'index'])->name('report.index');
+Route::get('/second-reports',[ReportController::class,'second_report'])->name('second_report');
+Route::post('/reports/filter',[ReportController::class,'index'])->name('report.index');
 

@@ -111,6 +111,10 @@
             <p>Reports</p>
           </a>
 
+          <a href="/second-reports" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+            <p>Second Reports</p>
+          </a>
           @elseif (auth()->user()->role == 'user')
           
           <a href="/reset-user" class="nav-link">

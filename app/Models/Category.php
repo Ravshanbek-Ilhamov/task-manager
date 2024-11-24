@@ -11,4 +11,9 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = ['name'];
+
+
+    public function taskAreas(){
+        return $this->hasMany(TaskArea::class);
+    }
 }

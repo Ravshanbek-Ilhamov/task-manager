@@ -90,12 +90,19 @@
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
+                        @error('user_id')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                     
                     <div class="form-group">
                         <label for="area-name">Area Name</label>
                         <input type="text" class="form-control" id="area-name" name="name" required>
+                        @error('name')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -129,12 +136,19 @@
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
+                        @error('user_id')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                     
                     <div class="form-group">
                         <label for="edit-area-name">Area Name</label>
                         <input type="text" class="form-control" id="edit-area-name" name="name" required>
+                        @error('name')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -105,12 +105,18 @@
                     @csrf
                     <div class="form-group mr-3">
                         <label for="start_date" class="mr-2">Start Date:</label>
-                        <input type="text" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ old('start_date', request('start_date')) }}">
+                        @error('start_date')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                     <div class="form-group mr-3">
                         <label for="end_date" class="mr-2">End Date:</label>
-                        <input type="text" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
-                    </div>
+                        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ old('end_date', request('end_date')) }}">
+                        @error('end_date')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>                    
                     <button type="submit" class="btn btn-primary btn-action">Filter</button>
                 </form>
             </div>

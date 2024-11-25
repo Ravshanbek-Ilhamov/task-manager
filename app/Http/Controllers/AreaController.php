@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAreaRequest;
+use App\Http\Requests\UpdateAreaRequest;
 use App\Models\Area;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,25 +16,15 @@ class AreaController extends Controller
         return view('area.areas', compact('areas','users'));
     }
 
-    public function store(Request $request)
+    public function store(StoreAreaRequest $request)
     {
-        $request->validate([
-            'user_id' => 'required|integer',
-            'name' => 'required|string|max:255',
-        ]);
-
         Area::create($request->all());
 
         return redirect()->back()->with('success', 'Area created successfully!');
     }
 
-    public function update(Request $request)
+    public function update(UpdateAreaRequest $request)
     {
-        $request->validate([
-            'id' => 'required|integer|exists:areas,id',
-            'user_id' => 'required|integer',
-            'name' => 'required|string|max:255',
-        ]);
 
         $area = Area::findOrFail($request->id);
         $area->update($request->all());

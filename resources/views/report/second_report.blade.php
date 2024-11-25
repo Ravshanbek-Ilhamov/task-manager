@@ -21,7 +21,9 @@
                             <thead class="thead-dark">
                             <tr>
                                 <th>№</th>
-                                <th>Hududlar</th>
+                                <th>Areas/
+                                    Category
+                                </th>
                                 <th>Status</th>
                                 @foreach($areas as $hudud)
                                     <th style="writing-mode: vertical-rl; transform: rotate(180deg);">
@@ -39,17 +41,16 @@
                                     <td>
                                         <table class="table table-borderless">
                                             <tr><td>Approved</td></tr>
-                                            <tr><td>Jarayonda</td></tr>
-                                            <tr><td>Ko'rilgan</td></tr>
+                                            <tr><td>Done</td></tr>
+                                            <tr><td>Opened</td></tr>
                                             <tr><td>Sent</td></tr>
                                             <tr><td>Rejected</td></tr>
-                                            <tr><td>Muddat buzilgan</td></tr>
                                         </table>
                                     </td>
                                     @foreach($areas as $hudud)
                                         <td>
                                             <table class="table table-borderless">
-                                                @foreach([4 => 'success', 3 => 'primary', 2 => 'warning', 1 => 'info', 0 => 'secondary'] as $status => $color)
+                                                @foreach(['approved' => 'success', 'done' => 'primary', 'opened' => 'warning', 'sent' => 'info'] as $status => $color)                            
                                                     <tr>
                                                         <td>
                                                             <button class="btn btn-{{$color}} btn-sm">
@@ -62,7 +63,7 @@
                                                     <td>
                                                         <button class="btn btn-danger btn-sm">
                                                             {{$category->taskAreas->where('area_id', $hudud->id)->where('period', '<', date('Y-m-d'))->where('status','!=','approved')->count()}}
-                                                        </button>
+                                                           </button>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -70,7 +71,7 @@
                                     @endforeach
                                     <td>
                                         <table class="table table-borderless">
-                                            @foreach([4 => 'success', 3 => 'primary', 2 => 'warning', 1 => 'info', 0 => 'secondary'] as $status => $color)
+                                            @foreach(['approved' => 'success', 'done' => 'primary', 'opened' => 'warning', 'sent' => 'info'] as $status => $color)
                                                 <tr>
                                                     <td>
                                                         <button class="btn btn-{{$color}} btn-sm">
@@ -82,7 +83,7 @@
                                             <tr>
                                                 <td>
                                                     <button class="btn btn-danger btn-sm">
-                                                        {{$category->taskAreas->where('period', '<', date('Y-m-d'))->where('status','!=','approved')->count()}}
+                                                        {{$category->taskAreas->where('period', '<', now())->where('status','!=','approved')->count()}}
                                                     </button>
                                                 </td>
                                             </tr>

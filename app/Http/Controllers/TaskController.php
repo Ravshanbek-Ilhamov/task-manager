@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ChangeTaskRequest;
+use App\Http\Requests\FilterDateRequest;
+use App\Http\Requests\RejectTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Area;
@@ -25,12 +28,7 @@ class TaskController extends Controller
         return view('task.task', compact('taskAreas'));
     }
 
-    public function filterDate(Request $request){
-
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
+    public function filterDate(FilterDateRequest $request){
         
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
@@ -119,9 +117,6 @@ class TaskController extends Controller
     
         return redirect('/tasks')->with('success', 'Task created successfully.');
     }
-
-
-    
       
     /**
      * Display the specified resource.
@@ -177,25 +172,19 @@ class TaskController extends Controller
 
     public function openTask(TaskArea $taskAreaStatus)
     {
-        // Update the status to 'opened'
         $taskAreaStatus->update(['status' => 'opened']);
 
         return redirect()->back()->with('success', 'Task status updated to "Opened".');
     }
 
-    public function doTask(Request $request, TaskArea $taskAreaStatus)
+    public function doTask(ChangeTaskRequest $request, TaskArea $taskAreaStatus)
     {
-        $request->validate([
-            'note' => 'required|string|max:255',
-            'file' => 'nullable|file|max:2048', // Adjust file size as needed
-        ]);
 
         $filePath = null;
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('responses', 'public');
         }
 
-        // Save the response`
         Response::create([
             'task_id' => $taskAreaStatus->task_id,
             'area_id' => $taskAreaStatus->area_id,
@@ -204,7 +193,6 @@ class TaskController extends Controller
             'status' => 'done',
         ]);
 
-        // Update the task area status to 'done'
         $taskAreaStatus->update(['status' => 'done']);
 
         return redirect()->back()->with('success', 'Task successfully marked as "Done".');
@@ -212,6 +200,11 @@ class TaskController extends Controller
 
     public function response_page(){
         $responses = Response::paginate(10);
+        return view('response.response',compact('responses'));
+    }
+
+    public function new_responses(){
+        $responses = Response::where('status','done')->paginate(10);
         return view('response.response',compact('responses'));
     }
 
@@ -227,20 +220,15 @@ class TaskController extends Controller
                             ->first();
     
         if ($taskArea) {
-            $taskArea->status = 'approved'; // Set the appropriate status
+            $taskArea->status = 'approved'; 
             $taskArea->save();
         }
     
         return redirect()->back()->with('success', 'Response accepted and TaskArea status updated.');
     }
     
-    public function rejectWithComment(Request $request)
-    {
-        $request->validate([
-            'response_id' => 'required|exists:responses,id',
-            'comment' => 'required|string|max:255',
-        ]);
-    
+    public function rejectWithComment(RejectTaskRequest $request)
+    {    
         $response = Response::findOrFail($request->response_id);
     
         $response->status = 'rejected';
@@ -258,8 +246,4 @@ class TaskController extends Controller
     
         return redirect()->back()->with('success', 'Response rejected with a comment, and TaskArea status updated.');
     }
-    
-    
-    
-
 }

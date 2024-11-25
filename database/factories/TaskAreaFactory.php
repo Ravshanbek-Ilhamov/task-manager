@@ -23,7 +23,7 @@ class TaskAreaFactory extends Factory
             'period' => fake()->date(),
             'area_id' =>fake()->numberBetween(1,10),
             'task_id' =>fake()->numberBetween(1,20),
-            'status' => Arr::random(['sent', 'opened', 'done', 'rejected', 'approved']),
+            'status' => Arr::random(['sent', 'opened', 'rejected', 'approved']),
         ];
     }
 }

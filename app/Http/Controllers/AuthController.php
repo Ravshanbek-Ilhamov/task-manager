@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Container\Attributes\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,14 +19,7 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function login(Request $request){
-
-        // dd($request->all())
-
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+    public function login(LoginRequest $request){
     
         if (FacadesAuth::attempt(['email' => $request->email, 'password' => $request->password])) {
             if(FacadesAuth::user()->role == 'admin'){
@@ -41,14 +35,9 @@ class AuthController extends Controller
     }
 
 
-    public function register(Request $request)
+    public function register(StoreUserRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6|confirmed', // This will check password_confirmation
-        ]);
-        
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -68,12 +57,7 @@ class AuthController extends Controller
         return view('user.reset_user');
     }
 
-    public function user_update(Request $request, $id){
-        
-        $request->validate([
-            'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'required|min:5',
-        ]);
+    public function user_update(UpdateUserRequest $request, $id){
 
         $user = User::findOrFail($id);
         $user->email = $request->input('email');

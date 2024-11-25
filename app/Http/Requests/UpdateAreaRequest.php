@@ -11,7 +11,7 @@ class UpdateAreaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateAreaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'id' => 'required|integer|exists:areas,id',
+            'user_id' => 'required|integer',
+            'name' => 'required|string|max:255',
         ];
     }
 }

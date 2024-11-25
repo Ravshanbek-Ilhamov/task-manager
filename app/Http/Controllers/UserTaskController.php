@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilterDateRequest;
 use App\Models\TaskArea;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserTaskController extends Controller
@@ -13,7 +13,6 @@ class UserTaskController extends Controller
     {
         if(Auth::user()->area){
             $user = Auth::user()->area->id;
-
             $taskAreas = TaskArea::where('area_id',$user)->paginate(10);
 
             return view('user-page.user_page', ['taskAreas' => $taskAreas]);
@@ -22,13 +21,8 @@ class UserTaskController extends Controller
         }
     }
 
-    public function filterDate(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
-        
+    public function filterDate(FilterDateRequest $request)
+    {        
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $user = Auth::user();
@@ -38,9 +32,6 @@ class UserTaskController extends Controller
         return view('user-page.user_page', compact('taskAreas'));
     }
     
-
-
-
     public function takeFilterTask(string $status)
     {
         

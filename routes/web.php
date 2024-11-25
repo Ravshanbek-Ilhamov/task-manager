@@ -22,6 +22,8 @@ Route::post('/login',[AuthController::class,'login'])->name('login');
 
 Route::get('/registeration',[AuthController::class,'register_page'])->name('register.index');
 Route::post('/register',[AuthController::class,'register'])->name('register');
+Route::get('/reset-password',[UserController::class,'resetting_page'])->name('reset.password');
+Route::post('/recover-password',[UserController::class,'sendEmail'])->name('reset.data');
 
 
 Route::get('/users', [UserController::class, 'index'])->name('user.index');
@@ -57,6 +59,7 @@ Route::patch('/responses/{id}/accept', [TaskController::class, 'accept'])->name(
 Route::patch('/responses/{id}/reject', [TaskController::class, 'reject'])->name('responses.reject');
 Route::get('/responses', [TaskController::class, 'response_page'])->name('responses.page');
 Route::patch('/responses/reject-with-comment', [TaskController::class, 'rejectWithComment'])->name('responses.rejectWithComment');
+Route::get('/new-responses', [TaskController::class, 'new_responses'])->name('newresponse.index');
 
 
 Route::get('/user-tasks',[UserTaskController::class,'index']);
@@ -75,4 +78,3 @@ Route::get('/filter/{status}', [ControllController::class, 'filterByStatus'])->n
 Route::get('/reports',[ReportController::class,'index'])->name('report.index');
 Route::get('/second-reports',[ReportController::class,'second_report'])->name('second_report');
 Route::post('/reports/filter',[ReportController::class,'index'])->name('report.index');
-

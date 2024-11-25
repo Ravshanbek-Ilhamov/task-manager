@@ -37,7 +37,6 @@ class ControllController extends Controller
     }
 
     public function showTasksByAreaAndCategory($area, $category){
-
         $taskAreas = TaskArea::where('area_id', $area)
                         ->where('category_id', $category)
                         ->paginate(10);

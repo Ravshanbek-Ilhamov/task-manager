@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Jobs\SendEmailJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
@@ -15,15 +19,8 @@ class UserController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'password' => 'required|string|min:5',
-            'role' => 'required|string',
-        ]);
-    
+    public function store(UserStoreRequest $request)
+    {    
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -39,13 +36,8 @@ class UserController extends Controller
         return view('user.user_edit', compact('user'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'role' => 'required|string',
-        ]);
     
         $user = User::findOrFail($id);
         $user->update([
@@ -70,5 +62,37 @@ class UserController extends Controller
         session()->regenerateToken();
     
         return redirect()->route('login.index')->with('success', 'Logged out successfully.');
+    }
+
+    public function sendEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+    
+        $code = rand(100000, 999999);
+    
+        $user = User::where('email', $request->email)->first();
+    
+        if ($user) {
+            $user->update([
+                'password' => Hash::make($code), 
+            ]);
+    
+            $details = [
+                'email' => $request->email,
+                'code' => $code,
+            ];
+    
+            SendEmailJob::dispatch($details);
+    
+            return redirect('/')->with('success', 'Message has been sent to your email.');
+        } else {
+            return redirect('/')->with('error', 'Error occurred while trying to send the code.');
+        }
+    }
+
+    public function resetting_page(){
+        return view('auth.forgot-password');
     }
 }

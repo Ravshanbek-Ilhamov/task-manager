@@ -106,9 +106,6 @@
                                             <i class="fas fa-check"></i>
                                         </button>
                                     </form>
-                                    {{-- <form method="POST" action="{{ route('responses.reject', $response->id) }}" style="display:inline;">
-                                        @csrf
-                                        @method('PATCH') --}}
                                         <!-- Updated Reject Button -->
                                         <button type="button" class="btn btn-danger btn-sm reject-btn" 
                                                 title="Reject" data-toggle="modal" data-target="#rejectModal" 

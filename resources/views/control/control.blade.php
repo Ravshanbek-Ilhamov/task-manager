@@ -108,26 +108,6 @@
     }
 </style>
 
-@php
-    
-    // dd($tasksData);
-
-    // $todays = TaskArea::whereDate('period', '=', Carbon::today())
-    //             ->where('area_id',$user)->count();
-
-    // $oneDay = TaskArea::whereDate('period', '=', Carbon::tomorrow())
-    //             ->where('area_id',$user)->count();
-
-    // $twoDays = TaskArea::whereBetween('period', [Carbon::today(), Carbon::today()->addDays(2)])
-    //             ->where('area_id',$user)->count();
-
-    // $expired = TaskArea::whereDate('period', '<', Carbon::today())
-    //             ->where('area_id',$user)->count();
-
-    // dd($all,$todays,$oneDay,$twoDays,$expired);
-
-@endphp
-
 <div class="content-wrapper">
     <section class="content">
 
@@ -232,11 +212,6 @@
                     </div>
                 </div>
             </div>
-            
-
-                {{-- @if($taskAreas->isEmpty()) --}}
-                    {{-- <p>No responses found for the selected date range.</p> --}}
-                {{-- @else --}}
                     <table class="table table-striped table-bordered">
                         <thead class="thead-dark">
                             <tr>
@@ -252,7 +227,6 @@
                                 <td>{{ $area->name }}</td>
                                 @foreach ($categories as $category)
                                 @php
-                                    // dd($taskAreas[0]);
                                     $count = $taskAreas->where('area_id',$area->id)->where('category_id',$category->id)->count()
                                 @endphp
                                     <td>
@@ -270,7 +244,6 @@
                         @endforeach
                         </tbody>
                     </table>
-
         </div>
     </section>
 </div>
